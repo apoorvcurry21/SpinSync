@@ -1,0 +1,17 @@
+/* src/styles/Navbar.scss */
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    color: white;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+  }
+  
+  .nav-links li {
+    cursor: pointer;
+  }
+  
