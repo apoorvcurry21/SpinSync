@@ -45,5 +45,5 @@ const addPlayersToFirestore = async () => {
   }
 };
 
-// Function ko ek baar call kar ke Firestore me data daal de
+
 addPlayersToFirestore();

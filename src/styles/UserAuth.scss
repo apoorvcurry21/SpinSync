@@ -1,33 +1,32 @@
-.profile-container {
-  max-width: 800px;
+.auth-container {
+  max-width: 500px;
   margin: 40px auto;
   padding: 0 20px;
 
-  .profile-card {
+  .auth-card {
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
 
     h2 {
       font-size: 1.8rem;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       color: var(--primary-color);
-      position: relative;
-      padding-bottom: 10px;
-
-      &:after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background-color: var(--primary-color);
-      }
+      text-align: center;
     }
 
-    .profile-form {
+    .error-message {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: var(--error-color);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .auth-form {
       .form-group {
         margin-bottom: 20px;
 
@@ -63,7 +62,7 @@
         }
       }
 
-      .save-button {
+      .auth-button {
         width: 100%;
         padding: 14px;
         background-color: var(--primary-color);
@@ -86,21 +85,33 @@
         }
       }
     }
-  }
 
-  .loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-    font-size: 1.2rem;
-    color: var(--primary-color);
+    .auth-switch {
+      margin-top: 25px;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+
+      button {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.9rem;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
   }
 
   @media (max-width: 768px) {
     margin: 20px auto;
 
-    .profile-card {
+    .auth-card {
       padding: 20px;
 
       h2 {
@@ -108,4 +119,4 @@
       }
     }
   }
-}
+} 

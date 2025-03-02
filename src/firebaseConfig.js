@@ -12,7 +12,13 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const firestore = getFirestore(app);
 const auth = getAuth(app);
 
-export { db, auth };
+// Log authentication state changes for debugging
+auth.onAuthStateChanged((user) => {
+  console.log("User state changed:", user ? user.email : "signed out");
+});
+
+// Export firestore as both firestore and db for backward compatibility
+export { firestore, auth, firestore as db };

@@ -1,17 +1,233 @@
 /* src/styles/Navbar.scss */
 .navbar {
-    background-color: #333;
-    padding: 10px;
-    color: white;
-  }
-  
-  .nav-links {
-    list-style: none;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+
+  .navbar-container {
     display: flex;
-    gap: 15px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 70px;
   }
-  
-  .nav-links li {
+
+  .logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.7rem;
+      color: var(--primary-color);
+      margin-right: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      font-size: 1.9rem;
+      transition: transform 0.5s ease;
+      &:hover {
+        transform: rotate(20deg);
+      }
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0 5px;
+      position: relative;
+
+      &.active a {
+        color: var(--primary-color);
+        font-weight: 600;
+
+        &:after {
+          width: 100%;
+          opacity: 1;
+        }
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--text-color);
+        font-weight: 500;
+        padding: 10px 15px;
+        display: block;
+        transition: color 0.3s ease;
+        position: relative;
+
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: 5px;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background-color: var(--primary-color);
+          transition: width 0.3s ease, opacity 0.3s ease;
+          opacity: 0;
+        }
+
+        &:hover {
+          color: var(--primary-color);
+          
+          &:after {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+      }
+
+      &.auth-button {
+        margin-left: 15px;
+
+        .login-button {
+          background-color: var(--primary-color);
+          color: white;
+          padding: 10px 24px;
+          border-radius: 30px;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 10px rgba(0, 102, 245, 0.3);
+
+          &:hover {
+            background-color: darken(#0066f5, 8%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 102, 245, 0.4);
+          }
+
+          &:after {
+            display: none;
+          }
+        }
+
+        .logout-button {
+          background-color: transparent;
+          color: var(--text-color);
+          border: 1px solid var(--border-color);
+          padding: 10px 24px;
+          border-radius: 30px;
+          font-weight: 500;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--error-color);
+            border-color: var(--error-color);
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
     cursor: pointer;
+    padding: 5px;
+    z-index: 101;
+
+    span {
+      width: 28px;
+      height: 3px;
+      background-color: var(--text-color);
+      margin: 3px 0;
+      transition: all 0.3s ease;
+      border-radius: 3px;
+    }
+
+    &.open {
+      span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+      }
+
+      span:nth-child(2) {
+        opacity: 0;
+      }
+
+      span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+    }
   }
+
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: flex;
+      z-index: 101;
+    }
+
+    .nav-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 280px;
+      height: 100vh;
+      background-color: var(--card-bg);
+      box-shadow: -2px 0 20px rgba(0, 0, 0, 0.15);
+      flex-direction: column;
+      padding: 90px 0 30px;
+      transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+      z-index: 100;
+
+      &.open {
+        right: 0;
+      }
+
+      li {
+        width: 100%;
+        margin: 0;
+
+        a {
+          padding: 15px 25px;
+          width: 100%;
+          border-left: 3px solid transparent;
+          transition: all 0.3s ease;
+
+          &:after {
+            display: none;
+          }
+          
+          &:hover, &.active {
+            background-color: rgba(74, 142, 255, 0.08);
+            border-left-color: var(--primary-color);
+          }
+        }
+
+        &.auth-button {
+          margin: 15px 0 0;
+          padding: 0 25px;
+          width: 100%;
+
+          .login-button, .logout-button {
+            width: 100%;
+            text-align: center;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}
   
