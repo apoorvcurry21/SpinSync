@@ -151,18 +151,81 @@ const lastNames = [
 ];
 
 // Skill levels
-const skillLevels = ["Beginner", "Intermediate", "Advanced", "Professional"];
+export const skillLevels = [
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+  "Professional"
+];
 
 // Playing styles
-const playingStyles = [
+export const playingStyles = [
   "Offensive", "Defensive", "All-Round", "Aggressive", "Counter-Attack", 
   "Chopper", "Blocker", "Power Hitter", "Looper", "Technical"
 ];
 
 // Availability
-const availabilityOptions = [
+export const availabilityOptions = [
   "Weekday Evenings", "Weekend Mornings", "Weekend Afternoons", 
   "Weekday Mornings", "Anytime", "Weekday Afternoons"
+];
+
+// Additional player attributes
+export const playingHands = ["Right-Handed", "Left-Handed", "Ambidextrous"];
+
+const gripStyles = ["Shakehand", "Penhold", "Seemiller"];
+
+const trainingPreferences = [
+  "Practice Partner",
+  "Competitive Matches",
+  "Casual Games",
+  "Tournament Preparation",
+  "Technique Training",
+  "Coaching Sessions"
+];
+
+const tournaments = [
+  "Local Leagues",
+  "State Championships",
+  "National Tournaments",
+  "Club Competitions",
+  "Corporate Tournaments",
+  "Regional Championships"
+];
+
+const rankings = {
+  Beginner: [800, 1200],
+  Intermediate: [1200, 1800],
+  Advanced: [1800, 2200],
+  Professional: [2200, 2800]
+};
+
+export const languages = [
+  "English", "Spanish", "French", "German", "Chinese", "Japanese", 
+  "Korean", "Russian", "Portuguese", "Italian"
+];
+
+const equipmentBrands = [
+  "Butterfly",
+  "Stiga",
+  "DHS",
+  "Donic",
+  "Joola",
+  "Yasaka",
+  "Tibhar",
+  "Xiom",
+  "Nittaku"
+];
+
+const rubberTypes = [
+  "Tenergy 05",
+  "Hurricane 3",
+  "Rakza 7",
+  "Evolution MX-P",
+  "Fastarc G-1",
+  "Mark V",
+  "Dignics 09C",
+  "Rasanter R47"
 ];
 
 // Utility functions
@@ -244,8 +307,8 @@ export const generateTableData = (count = 100) => {
   return tables;
 };
 
-// Generate sample player data
-export const generatePlayerData = (count = 50) => {
+// Generate sample player data with enhanced attributes
+export const generatePlayerData = (count = 100) => {
   const players = [];
   
   for (let i = 0; i < count; i++) {
@@ -254,8 +317,15 @@ export const generatePlayerData = (count = 50) => {
     const lastName = getRandomElement(lastNames);
     const skillLevel = getRandomElement(skillLevels);
     const playingStyle = getRandomElement(playingStyles);
-    const availabilityCount = getRandomInt(1, 3);
+    const availabilityCount = getRandomInt(1, 4);
     const availability = getRandomSubarray(availabilityOptions, availabilityCount);
+    const trainingPrefsCount = getRandomInt(1, 3);
+    const tournamentCount = getRandomInt(0, 3);
+    const languagesCount = getRandomInt(1, 3);
+    
+    // Calculate rating based on skill level
+    const [minRating, maxRating] = rankings[skillLevel];
+    const rating = getRandomInt(minRating, maxRating);
     
     players.push({
       id: `player-${i + 1}`,
@@ -265,13 +335,29 @@ export const generatePlayerData = (count = 50) => {
         state: cityInfo.state
       },
       skillLevel: skillLevel,
+      rating: rating,
       playingStyle: playingStyle,
+      playingHand: getRandomElement(playingHands),
+      gripStyle: getRandomElement(gripStyles),
       availability: availability,
+      trainingPreferences: getRandomSubarray(trainingPreferences, trainingPrefsCount),
+      tournaments: getRandomSubarray(tournaments, tournamentCount),
+      languages: getRandomSubarray(languages, languagesCount),
       bio: `Table tennis enthusiast from ${cityInfo.name}. ${skillLevel} player with a ${playingStyle.toLowerCase()} style.`,
-      yearsPlaying: getRandomInt(1, 15),
-      equipment: Math.random() > 0.3 ? `${getRandomElement(['Butterfly', 'Stiga', 'Donic', 'Joola', 'Yasaka'])} ${getRandomElement(['blade', 'racket'])}` : null,
-      lookingForMatch: Math.random() > 0.2, // 80% chance of looking for a match
-      profileCompleted: Math.random() > 0.1, // 90% chance of having a completed profile
+      yearsPlaying: getRandomInt(1, 20),
+      equipment: {
+        blade: Math.random() > 0.2 ? `${getRandomElement(equipmentBrands)} ${getRandomElement(['blade', 'racket'])}` : null,
+        forehandRubber: Math.random() > 0.2 ? getRandomElement(rubberTypes) : null,
+        backhandRubber: Math.random() > 0.2 ? getRandomElement(rubberTypes) : null
+      },
+      achievements: Math.random() > 0.7 ? [
+        `${getRandomElement(['Winner', 'Runner-up', 'Semi-finalist'])} - ${getRandomElement(tournaments)} ${getRandomInt(2020, 2025)}`
+      ] : [],
+      coachingExperience: Math.random() > 0.8 ? getRandomInt(1, 10) : 0,
+      lookingForMatch: Math.random() > 0.2,
+      profileCompleted: Math.random() > 0.1,
+      memberSince: new Date(Date.now() - getRandomInt(0, 730) * 24 * 60 * 60 * 1000).toISOString(),
+      lastActive: new Date(Date.now() - getRandomInt(0, 30) * 24 * 60 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString()
     });
   }
@@ -279,81 +365,463 @@ export const generatePlayerData = (count = 50) => {
   return players;
 };
 
-// Export a function to add the sample data to Firebase
+// Utility function to delay execution (for rate limiting)
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Rate-limited batch commit function
+const commitBatchWithRetry = async (batch, attemptNumber = 1) => {
+  const maxAttempts = 3;
+  const baseDelay = 1000; // 1 second
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    if (attemptNumber < maxAttempts && error.code === 'resource-exhausted') {
+      const delayTime = baseDelay * Math.pow(2, attemptNumber - 1);
+      console.log(`Rate limit hit, retrying in ${delayTime}ms...`);
+      await delay(delayTime);
+      return commitBatchWithRetry(batch, attemptNumber + 1);
+    }
+    throw error;
+  }
+};
+
 export const addSampleDataToFirebase = async (firestore) => {
-  const tables = generateTableData(100);
-  const players = generatePlayerData(50);
+  const tables = generateTableData(50); // Reduced to 50 for better performance
+  const players = generatePlayerData(25); // Reduced to 25 for better performance
   
   try {
-    // Handle batch size limit (500 operations per batch)
-    const batchSize = 450; // Keep it under 500 to be safe
+    const batchSize = 450;
+    let operationsCompleted = 0;
+    let tablesAdded = 0;
+    let playersAdded = 0;
     
-    // Write tables in batches
-    let currentBatch = writeBatch(firestore);
-    let operationCount = 0;
-    
-    console.log(`Adding ${tables.length} tables to Firestore...`);
-    
-    for (let i = 0; i < tables.length; i++) {
-      const table = tables[i];
-      const tableRef = doc(collection(firestore, 'tables'), table.id);
-      currentBatch.set(tableRef, table);
-      operationCount++;
+    // Add tables
+    console.log('Adding tables to Firestore...');
+    for (let i = 0; i < tables.length; i += batchSize) {
+      const batch = writeBatch(firestore);
+      const chunk = tables.slice(i, i + batchSize);
       
-      // If we've reached the batch limit, commit and create a new batch
-      if (operationCount === batchSize) {
-        await currentBatch.commit();
-        console.log(`Committed batch of ${operationCount} table operations`);
-        currentBatch = writeBatch(firestore);
-        operationCount = 0;
+      chunk.forEach(table => {
+        const tableRef = doc(collection(firestore, 'tables'));
+        batch.set(tableRef, {
+          ...table,
+          id: tableRef.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      });
+
+      try {
+        await commitBatchWithRetry(batch);
+        operationsCompleted += chunk.length;
+        tablesAdded += chunk.length;
+        console.log(`Progress: ${operationsCompleted}/${tables.length + players.length} operations completed`);
+        
+        // Add a small delay between batches to prevent rate limiting
+        await delay(500);
+      } catch (error) {
+        console.error('Error in table batch:', error);
+        throw error;
       }
     }
-    
-    // Commit any remaining table operations
-    if (operationCount > 0) {
-      await currentBatch.commit();
-      console.log(`Committed final batch of ${operationCount} table operations`);
-    }
-    
-    console.log('Sample table data added successfully');
-    
-    // Reset for player data
-    currentBatch = writeBatch(firestore);
-    operationCount = 0;
-    
-    console.log(`Adding ${players.length} players to Firestore...`);
-    
-    for (let i = 0; i < players.length; i++) {
-      const player = players[i];
-      const userRef = doc(collection(firestore, 'users'), player.id);
-      currentBatch.set(userRef, player);
-      operationCount++;
+
+    // Add players
+    console.log('Adding players to Firestore...');
+    for (let i = 0; i < players.length; i += batchSize) {
+      const batch = writeBatch(firestore);
+      const chunk = players.slice(i, i + batchSize);
       
-      // If we've reached the batch limit, commit and create a new batch
-      if (operationCount === batchSize) {
-        await currentBatch.commit();
-        console.log(`Committed batch of ${operationCount} player operations`);
-        currentBatch = writeBatch(firestore);
-        operationCount = 0;
+      chunk.forEach(player => {
+        const playerRef = doc(collection(firestore, 'players'));
+        batch.set(playerRef, {
+          ...player,
+          id: playerRef.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      });
+
+      try {
+        await commitBatchWithRetry(batch);
+        operationsCompleted += chunk.length;
+        playersAdded += chunk.length;
+        console.log(`Progress: ${operationsCompleted}/${tables.length + players.length} operations completed`);
+        
+        // Add a small delay between batches to prevent rate limiting
+        await delay(500);
+      } catch (error) {
+        console.error('Error in player batch:', error);
+        throw error;
       }
     }
-    
-    // Commit any remaining player operations
-    if (operationCount > 0) {
-      await currentBatch.commit();
-      console.log(`Committed final batch of ${operationCount} player operations`);
-    }
-    
-    console.log('Sample player data added successfully');
-    
+
+    console.log('Sample data initialization completed successfully');
     return { 
       success: true, 
       message: 'Sample data added successfully', 
-      tableCount: tables.length, 
-      playerCount: players.length 
+      tableCount: tablesAdded, 
+      playerCount: playersAdded 
     };
   } catch (error) {
     console.error('Error adding sample data:', error);
-    return { success: false, error: error.message };
+    return { 
+      success: false, 
+      error: error.message,
+      tablesAdded,
+      playersAdded
+    };
   }
-}; 
+};
+
+export const samplePlayers = [
+  {
+    id: "p1",
+    name: "Raj Kumar",
+    location: { city: "Mumbai", state: "Maharashtra" },
+    skillLevel: "Advanced",
+    rating: 2100,
+    playingStyle: "Offensive",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 8,
+    availability: ["Weekday Evenings", "Weekend Mornings"],
+    trainingPreferences: ["Competitive Matches", "Tournament Preparation"],
+    tournaments: ["State Championships", "National Tournaments"],
+    languages: ["English", "Hindi", "Marathi"],
+    equipment: {
+      blade: "Butterfly Viscaria",
+      forehandRubber: "Tenergy 05",
+      backhandRubber: "Tenergy 05"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p2",
+    name: "Sarah Chen",
+    location: { city: "Bengaluru", state: "Karnataka" },
+    skillLevel: "Professional",
+    rating: 2450,
+    playingStyle: "All-Round",
+    playingHand: "Right-Handed",
+    gripStyle: "Penhold",
+    yearsPlaying: 15,
+    availability: ["Weekday Mornings", "Weekend Evenings"],
+    trainingPreferences: ["Coaching Sessions", "Tournament Preparation"],
+    tournaments: ["National Tournaments", "International Open"],
+    languages: ["English", "Mandarin", "Kannada"],
+    equipment: {
+      blade: "DHS Hurricane Long 5",
+      forehandRubber: "Hurricane 3",
+      backhandRubber: "Hurricane 3 Neo"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p3",
+    name: "Priya Sharma",
+    location: { city: "Delhi", state: "Delhi" },
+    skillLevel: "Intermediate",
+    rating: 1750,
+    playingStyle: "Defensive",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 4,
+    availability: ["Weekend Afternoons", "Weekend Evenings"],
+    trainingPreferences: ["Practice Partner", "Technique Training"],
+    tournaments: ["Local Leagues", "State Championships"],
+    languages: ["English", "Hindi"],
+    equipment: {
+      blade: "Stiga Infinity VPS V",
+      forehandRubber: "Rakza 7",
+      backhandRubber: "Rakza 7"
+    },
+    lastActive: "2025-04-07"
+  },
+  {
+    id: "p4",
+    name: "Mike Anderson",
+    location: { city: "Chennai", state: "Tamil Nadu" },
+    skillLevel: "Beginner",
+    rating: 1200,
+    playingStyle: "Aggressive",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 1,
+    availability: ["Weekday Evenings"],
+    trainingPreferences: ["Casual Games", "Technique Training"],
+    tournaments: ["Club Competitions"],
+    languages: ["English", "Tamil"],
+    equipment: {
+      blade: "Yasaka Sweden Extra",
+      forehandRubber: "Mark V",
+      backhandRubber: "Mark V"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p5",
+    name: "Arun Patel",
+    location: { city: "Ahmedabad", state: "Gujarat" },
+    skillLevel: "Advanced",
+    rating: 2000,
+    playingStyle: "Looper",
+    playingHand: "Left-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 10,
+    availability: ["Weekday Mornings", "Weekend Mornings"],
+    trainingPreferences: ["Competitive Matches", "Coaching Sessions"],
+    tournaments: ["State Championships", "Corporate Tournaments"],
+    languages: ["English", "Hindi", "Gujarati"],
+    equipment: {
+      blade: "Butterfly Timo Boll ALC",
+      forehandRubber: "Dignics 09C",
+      backhandRubber: "Dignics 05"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p6",
+    name: "Lin Wei",
+    location: { city: "Mumbai", state: "Maharashtra" },
+    skillLevel: "Professional",
+    rating: 2600,
+    playingStyle: "Offensive",
+    playingHand: "Right-Handed",
+    gripStyle: "Penhold",
+    yearsPlaying: 20,
+    availability: ["Weekday Afternoons", "Weekend Afternoons"],
+    trainingPreferences: ["Tournament Preparation", "Coaching Sessions"],
+    tournaments: ["National Tournaments", "International Open"],
+    languages: ["English", "Mandarin", "Hindi"],
+    equipment: {
+      blade: "DHS Hurricane Long 5X",
+      forehandRubber: "Hurricane 3 Neo",
+      backhandRubber: "Hurricane 3 Neo"
+    },
+    lastActive: "2025-04-07"
+  },
+  {
+    id: "p7",
+    name: "Kavya Menon",
+    location: { city: "Kochi", state: "Kerala" },
+    skillLevel: "Intermediate",
+    rating: 1600,
+    playingStyle: "Counter-Attack",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 3,
+    availability: ["Weekend Mornings", "Weekend Evenings"],
+    trainingPreferences: ["Practice Partner", "Casual Games"],
+    tournaments: ["Local Leagues"],
+    languages: ["English", "Malayalam", "Hindi"],
+    equipment: {
+      blade: "Xiom Vega Pro",
+      forehandRubber: "Vega Europe",
+      backhandRubber: "Vega Europe"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p8",
+    name: "David Kim",
+    location: { city: "Bengaluru", state: "Karnataka" },
+    skillLevel: "Advanced",
+    rating: 2200,
+    playingStyle: "Power Hitter",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 12,
+    availability: ["Weekday Evenings", "Weekend Evenings"],
+    trainingPreferences: ["Competitive Matches", "Tournament Preparation"],
+    tournaments: ["State Championships", "National Tournaments"],
+    languages: ["English", "Korean", "Kannada"],
+    equipment: {
+      blade: "Butterfly Zhang Jike Super ZLC",
+      forehandRubber: "Tenergy 64",
+      backhandRubber: "Tenergy 05"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p9",
+    name: "Maya Desai",
+    location: { city: "Pune", state: "Maharashtra" },
+    skillLevel: "Beginner",
+    rating: 1100,
+    playingStyle: "All-Round",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 1,
+    availability: ["Weekday Mornings", "Weekend Mornings"],
+    trainingPreferences: ["Technique Training", "Casual Games"],
+    tournaments: ["Club Competitions"],
+    languages: ["English", "Hindi", "Marathi"],
+    equipment: {
+      blade: "Stiga Classic",
+      forehandRubber: "Mark V",
+      backhandRubber: "Mark V"
+    },
+    lastActive: "2025-04-07"
+  },
+  {
+    id: "p10",
+    name: "Zhao Ming",
+    location: { city: "Delhi", state: "Delhi" },
+    skillLevel: "Professional",
+    rating: 2500,
+    playingStyle: "Offensive",
+    playingHand: "Left-Handed",
+    gripStyle: "Penhold",
+    yearsPlaying: 18,
+    availability: ["Weekday Afternoons", "Weekend Afternoons"],
+    trainingPreferences: ["Tournament Preparation", "Coaching Sessions"],
+    tournaments: ["National Tournaments", "International Open"],
+    languages: ["English", "Mandarin", "Hindi"],
+    equipment: {
+      blade: "Butterfly Harimoto Tomokazu ALC",
+      forehandRubber: "Dignics 09C",
+      backhandRubber: "Dignics 05"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p11",
+    name: "Arjun Reddy",
+    location: { city: "Hyderabad", state: "Telangana" },
+    skillLevel: "Advanced",
+    rating: 2150,
+    playingStyle: "Looper",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 9,
+    availability: ["Weekday Evenings", "Weekend Mornings"],
+    trainingPreferences: ["Competitive Matches", "Tournament Preparation"],
+    tournaments: ["State Championships", "Corporate Tournaments"],
+    languages: ["English", "Hindi", "Telugu"],
+    equipment: {
+      blade: "Butterfly Viscaria",
+      forehandRubber: "Tenergy 05",
+      backhandRubber: "Tenergy 05"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p12",
+    name: "Emma Wilson",
+    location: { city: "Bengaluru", state: "Karnataka" },
+    skillLevel: "Intermediate",
+    rating: 1800,
+    playingStyle: "Technical",
+    playingHand: "Right-Handed",
+    gripStyle: "Seemiller",
+    yearsPlaying: 5,
+    availability: ["Weekend Mornings", "Weekend Afternoons"],
+    trainingPreferences: ["Practice Partner", "Technique Training"],
+    tournaments: ["Local Leagues", "Club Competitions"],
+    languages: ["English", "Kannada"],
+    equipment: {
+      blade: "Donic Waldner Senso Carbon",
+      forehandRubber: "Evolution MX-P",
+      backhandRubber: "Evolution MX-P"
+    },
+    lastActive: "2025-04-07"
+  },
+  {
+    id: "p13",
+    name: "Rajesh Verma",
+    location: { city: "Lucknow", state: "Uttar Pradesh" },
+    skillLevel: "Beginner",
+    rating: 1300,
+    playingStyle: "Defensive",
+    playingHand: "Right-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 2,
+    availability: ["Weekday Evenings", "Weekend Evenings"],
+    trainingPreferences: ["Casual Games", "Technique Training"],
+    tournaments: ["Club Competitions"],
+    languages: ["English", "Hindi"],
+    equipment: {
+      blade: "Stiga Allround Classic",
+      forehandRubber: "Rakza 7",
+      backhandRubber: "Rakza 7"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p14",
+    name: "Liu Yang",
+    location: { city: "Chennai", state: "Tamil Nadu" },
+    skillLevel: "Professional",
+    rating: 2550,
+    playingStyle: "Offensive",
+    playingHand: "Right-Handed",
+    gripStyle: "Penhold",
+    yearsPlaying: 16,
+    availability: ["Weekday Mornings", "Weekend Afternoons"],
+    trainingPreferences: ["Tournament Preparation", "Coaching Sessions"],
+    tournaments: ["National Tournaments", "International Open"],
+    languages: ["English", "Mandarin", "Tamil"],
+    equipment: {
+      blade: "DHS Hurricane Long 5",
+      forehandRubber: "Hurricane 3 Neo",
+      backhandRubber: "Hurricane 3 Neo"
+    },
+    lastActive: "2025-04-08"
+  },
+  {
+    id: "p15",
+    name: "Anita Gupta",
+    location: { city: "Kolkata", state: "West Bengal" },
+    skillLevel: "Advanced",
+    rating: 2050,
+    playingStyle: "Counter-Attack",
+    playingHand: "Left-Handed",
+    gripStyle: "Shakehand",
+    yearsPlaying: 7,
+    availability: ["Weekday Afternoons", "Weekend Mornings"],
+    trainingPreferences: ["Competitive Matches", "Tournament Preparation"],
+    tournaments: ["State Championships", "National Tournaments"],
+    languages: ["English", "Hindi", "Bengali"],
+    equipment: {
+      blade: "Butterfly Timo Boll ALC",
+      forehandRubber: "Tenergy 64",
+      backhandRubber: "Tenergy 05"
+    },
+    lastActive: "2025-04-07"
+  }
+];
+
+export const cities = [
+  "Mumbai",
+  "Delhi",
+  "Bengaluru",
+  "Hyderabad",
+  "Chennai",
+  "Kolkata",
+  "Pune",
+  "Ahmedabad",
+  "Kochi",
+  "Lucknow"
+];
+
+export const states = [
+  "Maharashtra",
+  "Delhi",
+  "Karnataka",
+  "Telangana",
+  "Tamil Nadu",
+  "West Bengal",
+  "Gujarat",
+  "Kerala",
+  "Uttar Pradesh"
+];
+
+export const availabilitySlots = [
+  "Weekday Mornings",
+  "Weekday Afternoons",
+  "Weekday Evenings",
+  "Weekend Mornings",
+  "Weekend Afternoons",
+  "Weekend Evenings"
+];

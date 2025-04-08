@@ -11,8 +11,14 @@ import {
   doc, 
   getDoc, 
   setDoc, 
-  updateDoc 
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  limit
 } from 'firebase/firestore';
+import { populateDatabase } from '../utils/populateDatabase';
 
 // Create Auth Context
 const AuthContext = createContext();
@@ -32,6 +38,26 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const checkAndPopulateDatabase = async () => {
+    try {
+      // Check if we have any tables or players in the database
+      const tablesQuery = query(collection(firestore, 'tables'), limit(1));
+      const playersQuery = query(collection(firestore, 'players'), limit(1));
+      
+      const [tablesSnapshot, playersSnapshot] = await Promise.all([
+        getDocs(tablesQuery),
+        getDocs(playersQuery)
+      ]);
+
+      // If both collections are empty, populate the database
+      if (tablesSnapshot.empty && playersSnapshot.empty) {
+        await populateDatabase();
+      }
+    } catch (err) {
+      console.error('Error checking/populating database:', err);
+    }
+  };
 
   // Listen for auth state changes
   useEffect(() => {
@@ -58,6 +84,9 @@ export const AuthProvider = ({ children }) => {
             await setDoc(userDocRef, initialProfile);
             setUserProfile(initialProfile);
           }
+
+          // Check and populate database with sample data if needed
+          await checkAndPopulateDatabase();
         } catch (err) {
           console.error('Error fetching user profile:', err);
           setError(err.message);
@@ -73,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Sign up function
-  const signUp = async (email, password, displayName) => {
+  const signUp = async (email, password, displayName, additionalData = {}) => {
     try {
       setLoading(true);
       setError(null);
@@ -88,12 +117,29 @@ export const AuthProvider = ({ children }) => {
 
       // Create user document in Firestore
       const userDocRef = doc(firestore, 'users', userCredential.user.uid);
-      await setDoc(userDocRef, {
+      const userData = {
         name: displayName || '',
         email: userCredential.user.email,
         uid: userCredential.user.uid,
         createdAt: new Date().toISOString(),
-        profileCompleted: false
+        skillLevel: additionalData.skillLevel || '',
+        location: additionalData.location || '',
+        gamesPlayed: 0,
+        connections: 0,
+        profileCompleted: true
+      };
+
+      await setDoc(userDocRef, userData);
+      setUserProfile(userData);
+
+      // Also create a player document
+      const playerDocRef = doc(firestore, 'players', userCredential.user.uid);
+      await setDoc(playerDocRef, {
+        ...userData,
+        availability: [],
+        playingStyle: '',
+        bio: '',
+        lookingForMatch: true
       });
 
       return userCredential.user;
@@ -111,6 +157,15 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Fetch user profile after login
+      const userDocRef = doc(firestore, 'users', userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        setUserProfile(userDoc.data());
+      }
+      
       return userCredential.user;
     } catch (err) {
       setError(err.message);
@@ -175,9 +230,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext; 
+export default AuthContext;

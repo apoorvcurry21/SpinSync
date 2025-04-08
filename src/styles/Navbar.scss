@@ -16,7 +16,11 @@
     padding: 0 24px;
     max-width: 1400px;
     margin: 0 auto;
-    height: 70px;
+    height: var(--header-height);
+
+    @media (max-width: 768px) {
+      padding: 0 16px;
+    }
   }
 
   .logo {
@@ -24,6 +28,7 @@
     align-items: center;
     text-decoration: none;
     transition: transform 0.3s ease;
+    z-index: 102;
 
     &:hover {
       transform: scale(1.05);
@@ -35,11 +40,20 @@
       color: var(--primary-color);
       margin-right: 10px;
       letter-spacing: -0.5px;
+
+      @media (max-width: 480px) {
+        font-size: 1.5rem;
+      }
     }
 
     .logo-icon {
       font-size: 1.9rem;
       transition: transform 0.5s ease;
+      
+      @media (max-width: 480px) {
+        font-size: 1.7rem;
+      }
+
       &:hover {
         transform: rotate(20deg);
       }
@@ -52,9 +66,9 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    gap: 5px;
 
     li {
-      margin: 0 5px;
       position: relative;
 
       &.active a {
@@ -75,6 +89,7 @@
         display: block;
         transition: color 0.3s ease;
         position: relative;
+        white-space: nowrap;
 
         &:after {
           content: '';
@@ -101,6 +116,11 @@
       &.auth-button {
         margin-left: 15px;
 
+        @media (max-width: 768px) {
+          margin: 15px 0 0;
+          width: 100%;
+        }
+
         .login-button {
           background-color: var(--primary-color);
           color: white;
@@ -109,6 +129,7 @@
           font-weight: 500;
           transition: all 0.3s ease;
           box-shadow: 0 4px 10px rgba(0, 102, 245, 0.3);
+          text-align: center;
 
           &:hover {
             background-color: darken(#0066f5, 8%);
@@ -129,6 +150,9 @@
           border-radius: 30px;
           font-weight: 500;
           transition: all 0.3s ease;
+          text-align: center;
+          width: 100%;
+          display: inline-block;
 
           &:hover {
             background-color: rgba(220, 53, 69, 0.1);
@@ -147,10 +171,11 @@
     cursor: pointer;
     padding: 5px;
     z-index: 101;
+    margin-left: 15px;
 
     span {
-      width: 28px;
-      height: 3px;
+      width: 24px;
+      height: 2px;
       background-color: var(--text-color);
       margin: 3px 0;
       transition: all 0.3s ease;
@@ -159,7 +184,7 @@
 
     &.open {
       span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 6px);
+        transform: rotate(45deg) translate(5px, 5px);
       }
 
       span:nth-child(2) {
@@ -167,7 +192,7 @@
       }
 
       span:nth-child(3) {
-        transform: rotate(-45deg) translate(5px, -6px);
+        transform: rotate(-45deg) translate(5px, -5px);
       }
     }
   }
@@ -187,8 +212,8 @@
       background-color: var(--card-bg);
       box-shadow: -2px 0 20px rgba(0, 0, 0, 0.15);
       flex-direction: column;
-      padding: 90px 0 30px;
-      transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+      padding: calc(var(--header-height) + 20px) 0 30px;
+      transition: right 0.3s ease;
       z-index: 100;
 
       &.open {
@@ -229,5 +254,10 @@
       }
     }
   }
+
+  @media (max-width: 480px) {
+    .nav-links {
+      width: 100%;
+    }
+  }
 }
-  

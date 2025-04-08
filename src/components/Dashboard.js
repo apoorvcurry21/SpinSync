@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthState } from '../contexts/AuthContext';
 import '../styles/Dashboard.scss';
 
 const Dashboard = () => {
   const { user, userProfile } = useAuthState();
+  const navigate = useNavigate();
   const [recentTables, setRecentTables] = useState([]);
   const [recentPlayers, setRecentPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,12 +99,27 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-actions">
-        <button className="action-button primary">Find Tables</button>
-        <button className="action-button secondary">Find Players</button>
-        <button className="action-button tertiary">Update Profile</button>
+        <button 
+          className="action-button primary"
+          onClick={() => navigate('/find-tables')}
+        >
+          Find Tables
+        </button>
+        <button 
+          className="action-button secondary"
+          onClick={() => navigate('/find-players')}
+        >
+          Find Players
+        </button>
+        <button 
+          className="action-button tertiary"
+          onClick={() => navigate('/profile')}
+        >
+          Update Profile
+        </button>
       </div>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

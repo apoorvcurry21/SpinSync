@@ -9,24 +9,30 @@
   flex-direction: row;
   align-items: center;
   gap: 40px;
-  padding: 40px 20px;
-  margin-bottom: 30px;
+  padding: clamp(20px, 5vw, 40px);
+  margin: 20px auto 30px;
   position: relative;
   min-height: 60vh;
-  overflow: hidden;
   background: linear-gradient(135deg, var(--card-bg) 0%, var(--light-bg) 100%);
   border-radius: 16px;
-  margin-top: 20px;
+  overflow: hidden;
+  
+  @media (max-width: 992px) {
+    flex-direction: column;
+    min-height: auto;
+    text-align: center;
+    gap: 30px;
+  }
   
   .hero-content {
     flex: 1;
     z-index: 1;
     
     h1 {
-      font-size: 3.5rem;
+      font-size: clamp(2rem, 5vw, 3.5rem);
       font-weight: 700;
       line-height: 1.2;
-      margin-bottom: 16px;
+      margin-bottom: clamp(16px, 3vw, 24px);
       
       .highlight {
         color: var(--primary-color);
@@ -48,24 +54,27 @@
     }
     
     h2 {
-      font-size: 1.5rem;
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
       font-weight: 400;
       color: var(--text-color);
-      margin-bottom: 32px;
+      margin-bottom: clamp(24px, 5vw, 32px);
       opacity: 0.9;
     }
   }
   
   .hero-image {
     flex: 1;
+    max-width: 600px;
     height: 100%;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: transform 0.5s ease;
     
-    &:hover {
-      transform: scale(1.02);
+    @media (max-width: 992px) {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
     }
     
     img {
@@ -79,19 +88,29 @@
   
   .cta-buttons {
     display: flex;
-    gap: 16px;
-    margin-top: 24px;
+    gap: clamp(12px, 2vw, 16px);
+    margin-top: clamp(20px, 4vw, 24px);
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+    }
     
     .cta-button {
       display: inline-block;
-      padding: 14px 32px;
+      padding: clamp(12px, 2vw, 14px) clamp(24px, 4vw, 32px);
       border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
       text-align: center;
       transition: all 0.3s ease;
-      font-size: 1rem;
-      cursor: pointer;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
+      min-width: 160px;
+      
+      @media (max-width: 768px) {
+        width: 100%;
+        min-width: unset;
+      }
       
       &.primary {
         background-color: var(--primary-color);
@@ -125,15 +144,23 @@
   margin: 0 auto 60px;
   max-width: 900px;
   padding: 0 20px;
+  gap: clamp(20px, 4vw, 40px);
+  flex-wrap: wrap;
   
-  .stat-item {
-    display: flex;
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .stat-item {
+    flex: 1;
+    min-width: 200px;
+    padding: clamp(15px, 3vw, 20px);
     
     .stat-number {
-      font-size: 3.5rem;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
       font-weight: 700;
       color: var(--primary-color);
       margin-bottom: 8px;
@@ -141,7 +168,7 @@
     }
     
     .stat-label {
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
       color: var(--text-color);
       font-weight: 500;
       text-transform: uppercase;
@@ -151,16 +178,16 @@
 }
 
 .features-section {
-  padding: 60px 20px;
+  padding: clamp(40px, 8vw, 60px) 20px;
   text-align: center;
   background-color: var(--light-bg);
   border-radius: 16px;
-  margin-bottom: 60px;
+  margin-bottom: clamp(40px, 8vw, 60px);
   
   h2 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 700;
-    margin-bottom: 40px;
+    margin-bottom: clamp(30px, 6vw, 40px);
     position: relative;
     display: inline-block;
     
@@ -178,21 +205,24 @@
   .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
+    gap: clamp(20px, 4vw, 30px);
     max-width: 1200px;
     margin: 0 auto;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
     
     .feature-card {
       background-color: var(--card-bg);
       border-radius: 16px;
-      padding: 40px 20px;
+      padding: clamp(30px, 6vw, 40px) clamp(15px, 3vw, 20px);
       transition: all 0.3s ease;
       box-shadow: var(--shadow);
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      cursor: pointer;
       
       &:hover {
         transform: translateY(-10px);
@@ -205,27 +235,27 @@
       }
       
       .feature-icon {
-        font-size: 2rem;
+        font-size: clamp(1.8rem, 3vw, 2rem);
         background-color: rgba(0, 98, 204, 0.1);
-        width: 80px;
-        height: 80px;
+        width: clamp(60px, 10vw, 80px);
+        height: clamp(60px, 10vw, 80px);
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        margin-bottom: 24px;
+        margin-bottom: clamp(20px, 4vw, 24px);
         transition: all 0.3s ease;
       }
       
       h3 {
-        font-size: 1.5rem;
+        font-size: clamp(1.3rem, 2vw, 1.5rem);
         font-weight: 600;
         margin-bottom: 16px;
         color: var(--text-color);
       }
       
       p {
-        font-size: 1rem;
+        font-size: clamp(0.9rem, 1.5vw, 1rem);
         line-height: 1.6;
         color: var(--text-color);
         opacity: 0.8;
@@ -235,13 +265,13 @@
 }
 
 .how-it-works {
-  padding: 60px 20px;
+  padding: clamp(40px, 8vw, 60px) 20px;
   text-align: center;
   
   h2 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 700;
-    margin-bottom: 40px;
+    margin-bottom: clamp(30px, 6vw, 40px);
     position: relative;
     display: inline-block;
     
@@ -260,15 +290,22 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 30px;
+    gap: clamp(20px, 4vw, 30px);
     max-width: 1200px;
-    margin: 0 auto 40px;
+    margin: 0 auto clamp(30px, 6vw, 40px);
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+    }
     
     .step {
+      flex: 1;
+      min-width: 280px;
+      max-width: 350px;
       background-color: var(--card-bg);
       border-radius: 16px;
-      padding: 40px 30px;
-      width: 300px;
+      padding: clamp(30px, 6vw, 40px) clamp(20px, 4vw, 30px);
       position: relative;
       text-align: center;
       box-shadow: var(--shadow);
@@ -287,26 +324,27 @@
       .step-number {
         background-color: rgba(0, 98, 204, 0.1);
         color: var(--primary-color);
-        width: 48px;
-        height: 48px;
+        width: clamp(40px, 8vw, 48px);
+        height: clamp(40px, 8vw, 48px);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: clamp(1.3rem, 2vw, 1.5rem);
         font-weight: 700;
         margin: 0 auto 24px;
         transition: all 0.3s ease;
       }
       
       h3 {
-        font-size: 1.3rem;
+        font-size: clamp(1.2rem, 2vw, 1.3rem);
         font-weight: 600;
         margin-bottom: 16px;
+        color: var(--text-color);
       }
       
       p {
-        font-size: 1rem;
+        font-size: clamp(0.9rem, 1.5vw, 1rem);
         line-height: 1.6;
         color: var(--text-color);
         opacity: 0.8;
@@ -315,20 +353,25 @@
   }
   
   .get-started {
-    margin-top: 40px;
+    margin-top: clamp(30px, 6vw, 40px);
     
     .cta-button {
       display: inline-block;
-      padding: 16px 40px;
+      padding: clamp(14px, 2.5vw, 16px) clamp(30px, 5vw, 40px);
       border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
       text-align: center;
       transition: all 0.3s ease;
-      font-size: 1.1rem;
+      font-size: clamp(1rem, 1.5vw, 1.1rem);
       background-color: var(--primary-color);
       color: white;
       box-shadow: 0 4px 12px rgba(0, 98, 204, 0.3);
+      
+      @media (max-width: 768px) {
+        width: 100%;
+        max-width: 300px;
+      }
       
       &:hover {
         background-color: darken(#0062cc, 10%);

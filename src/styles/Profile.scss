@@ -1,88 +1,173 @@
 .profile-container {
   max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
+  margin: clamp(20px, 4vw, 30px) auto;
+  padding: clamp(15px, 3vw, 20px);
 
   .profile-card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: clamp(20px, 4vw, 30px);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
 
     h2 {
-      font-size: 1.8rem;
-      margin-bottom: 30px;
-      color: var(--primary-color);
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: clamp(20px, 4vw, 30px);
+      color: var(--text-color);
+      text-align: center;
       position: relative;
-      padding-bottom: 10px;
-
+      display: inline-block;
+      width: 100%;
+      
       &:after {
         content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
+        display: block;
+        width: 80px;
+        height: 4px;
         background-color: var(--primary-color);
+        margin: 12px auto 0;
+        border-radius: 2px;
       }
     }
 
     .profile-form {
-      .form-group {
-        margin-bottom: 20px;
-
-        label {
-          display: block;
-          font-weight: 500;
-          margin-bottom: 8px;
-          color: #555;
+      .profile-image-section {
+        display: flex;
+        align-items: center;
+        gap: clamp(15px, 3vw, 20px);
+        margin-bottom: clamp(20px, 4vw, 30px);
+        
+        @media (max-width: 480px) {
+          flex-direction: column;
+          text-align: center;
         }
 
-        input, select {
-          width: 100%;
-          padding: 12px 15px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          font-size: 1rem;
-          transition: all 0.3s ease;
+        .profile-image {
+          width: clamp(80px, 15vw, 120px);
+          height: clamp(80px, 15vw, 120px);
+          border-radius: 50%;
+          background-color: var(--primary-color);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: clamp(2rem, 4vw, 3rem);
+          font-weight: bold;
+        }
 
-          &:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 98, 204, 0.2);
-            outline: none;
+        .image-controls {
+          flex: 1;
+          
+          .upload-button {
+            background-color: rgba(74, 142, 255, 0.1);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 30px;
+            padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 24px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+
+            &:hover {
+              background-color: rgba(74, 142, 255, 0.2);
+              transform: translateY(-2px);
+            }
+          }
+
+          p {
+            font-size: clamp(0.85rem, 1.5vw, 0.9rem);
+            color: var(--text-muted);
           }
         }
+      }
 
-        select {
-          appearance: none;
-          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-          background-repeat: no-repeat;
-          background-position: right 15px center;
-          background-size: 15px;
-          padding-right: 45px;
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: clamp(15px, 3vw, 20px);
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .form-group {
+          margin-bottom: clamp(15px, 3vw, 20px);
+
+          label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: clamp(0.9rem, 1.5vw, 0.95rem);
+          }
+
+          input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: clamp(0.95rem, 1.5vw, 1rem);
+            transition: all 0.3s ease;
+
+            &:focus {
+              border-color: var(--primary-color);
+              box-shadow: 0 0 0 2px rgba(0, 98, 204, 0.2);
+              outline: none;
+            }
+
+            @media (max-width: 768px) {
+              font-size: 16px; // Prevents zoom on focus in iOS
+            }
+          }
+
+          textarea {
+            min-height: 100px;
+            resize: vertical;
+          }
+
+          select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+            padding-right: 45px;
+          }
         }
       }
 
       .save-button {
         width: 100%;
-        padding: 14px;
+        padding: clamp(12px, 2.5vw, 14px);
         background-color: var(--primary-color);
         color: white;
         border: none;
         border-radius: 8px;
-        font-size: 1rem;
+        font-size: clamp(0.95rem, 1.5vw, 1rem);
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-top: 10px;
+        box-shadow: 0 4px 10px rgba(0, 102, 245, 0.3);
+        margin-top: clamp(10px, 2vw, 15px);
 
         &:hover {
           background-color: darken(#0062cc, 10%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(0, 102, 245, 0.4);
         }
 
         &:disabled {
-          background-color: #ccc;
+          opacity: 0.7;
           cursor: not-allowed;
+          transform: none;
         }
       }
     }
@@ -92,9 +177,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 300px;
-    font-size: 1.2rem;
+    min-height: clamp(150px, 30vh, 300px);
+    font-size: clamp(1.1rem, 2vw, 1.2rem);
     color: var(--primary-color);
+  }
+
+  .error-message {
+    text-align: center;
+    padding: clamp(15px, 3vw, 20px);
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--error-color);
+    border-radius: 16px;
+    font-size: clamp(1rem, 1.5vw, 1.1rem);
+    margin-bottom: clamp(20px, 4vw, 30px);
+  }
+
+  .success-message {
+    text-align: center;
+    padding: clamp(15px, 3vw, 20px);
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+    border-radius: 16px;
+    font-size: clamp(1rem, 1.5vw, 1.1rem);
+    margin-bottom: clamp(20px, 4vw, 30px);
   }
 
   @media (max-width: 768px) {

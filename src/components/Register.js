@@ -8,16 +8,20 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [skillLevel, setSkillLevel] = useState('');
+  const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const { signUp, loading } = useAuthState();
   const navigate = useNavigate();
+
+  const skillLevels = ["Beginner", "Intermediate", "Advanced", "Professional"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     // Validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !skillLevel || !location) {
       setError('Please fill in all fields');
       return;
     }
@@ -33,7 +37,11 @@ const Register = () => {
     }
 
     try {
-      await signUp(email, password, name);
+      // Pass additional profile data with registration
+      await signUp(email, password, name, {
+        skillLevel,
+        location
+      });
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to create account. Please try again.');
@@ -69,6 +77,33 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="skillLevel">Skill Level</label>
+            <select
+              id="skillLevel"
+              value={skillLevel}
+              onChange={(e) => setSkillLevel(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">Select your skill level</option>
+              {skillLevels.map(level => (
+                <option key={level} value={level}>{level}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="location">Location</label>
+            <input
+              id="location"
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Enter your city"
               disabled={loading}
             />
           </div>
@@ -127,4 +162,4 @@ const Register = () => {
   );
 };
 
-export default Register; 
+export default Register;

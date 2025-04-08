@@ -5,20 +5,6 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "leaflet/dist/leaflet.css";
 
-// Optionally populate the database with sample data in development mode
-// Uncomment this section to populate database with sample data
-/*
-if (process.env.NODE_ENV === 'development') {
-  import('./utils/populateDatabase')
-    .then(module => {
-      // Uncomment the line below to populate data automatically
-      // module.populateDatabase();
-      console.log('Sample data population available - use the button in the app to populate data');
-    })
-    .catch(err => console.error('Failed to load sample data module:', err));
-}
-*/
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

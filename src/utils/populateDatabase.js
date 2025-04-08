@@ -4,19 +4,30 @@ import { addSampleDataToFirebase } from './sampleData';
 // This function can be called to populate the database with sample data
 export const populateDatabase = async () => {
   try {
-    console.log('Starting to populate database with sample data...');
+    console.log('Initializing database with sample data...');
     const result = await addSampleDataToFirebase(db);
     
     if (result.success) {
-      console.log(`Successfully added ${result.tableCount} tables and ${result.playerCount} players to the database.`);
-      return { success: true, message: result.message };
+      console.log(`Successfully initialized database with ${result.tableCount} tables and ${result.playerCount} players.`);
+      return {
+        success: true,
+        tableCount: result.tableCount,
+        playerCount: result.playerCount,
+        message: 'Database initialized successfully'
+      };
     } else {
-      console.error('Failed to add sample data:', result.error);
-      return { success: false, error: result.error };
+      console.error('Failed to initialize database:', result.error);
+      return { 
+        success: false, 
+        error: result.error 
+      };
     }
   } catch (error) {
-    console.error('Error in populating database:', error);
-    return { success: false, error: error.message };
+    console.error('Error initializing database:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
   }
 };
 
@@ -67,4 +78,4 @@ export const PopulateDatabaseButton = ({ onComplete }) => {
   );
 };
 
-export default populateDatabase; 
+export default populateDatabase;

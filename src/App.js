@@ -13,16 +13,10 @@ import FindPlayers from './components/FindPlayers';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/App.scss';
 
-// Import PopulateDatabaseButton only in development mode
-const PopulateDatabaseButton = process.env.NODE_ENV === 'development' 
-  ? React.lazy(() => import('./components/PopulateDatabaseButton'))
-  : null;
-
 function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading time for smooth transitions
     const timer = setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -71,15 +65,6 @@ function App() {
                 } />
               </Routes>
             </main>
-
-            {/* Render PopulateDatabaseButton only in development mode */}
-            {process.env.NODE_ENV === 'development' && PopulateDatabaseButton && (
-              <React.Suspense fallback={<div />}>
-                <div className="populate-db-button-container">
-                  <PopulateDatabaseButton />
-                </div>
-              </React.Suspense>
-            )}
           </div>
         </ThemeProvider>
       </AuthProvider>
