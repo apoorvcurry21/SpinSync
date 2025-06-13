@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -11,14 +12,19 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
 const auth = getAuth(app);
+const firestore = getFirestore(app);
 
 // Log authentication state changes for debugging
-auth.onAuthStateChanged((user) => {
-  console.log("User state changed:", user ? user.email : "signed out");
-});
+// onAuthStateChanged(auth, (user) => {
+//   if (user) {
+//     console.log('User is signed in:', user);
+//   } else {
+//     console.log('User is signed out');
+//   }
+// });
 
 // Export firestore as both firestore and db for backward compatibility
 export { firestore, auth, firestore as db };
