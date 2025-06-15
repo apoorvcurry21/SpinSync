@@ -540,7 +540,7 @@ const FindPlayers = () => {
                     )}
                   </div>
 
-                  {player.availability && player.availability.length > 0 && (
+                  {player.availability && Array.isArray(player.availability) && player.availability.length > 0 && (
                     <div className="detail-item">
                       <div className="label">Available:</div>
                       <div className="availability-tags">
@@ -562,7 +562,7 @@ const FindPlayers = () => {
                     </div>
                   )}
 
-                  {player.languages && player.languages.length > 0 && (
+                  {player.languages && Array.isArray(player.languages) && player.languages.length > 0 && (
                     <div className="detail-item">
                       <div className="label">Languages:</div>
                       <div className="language-tags">
